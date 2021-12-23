@@ -1,0 +1,105 @@
+---
+title: "Project2"
+author: "Dhwani Kirankumar Trivedi"
+date: "12/12/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+Keyword_data <- read.csv("~/Downloads/Keyword_data.csv")
+# Stack all variables to find unique
+s<-stack(Keyword_data)
+# Calculate unique keywords
+u<-unique(s$values)
+# Create a weighted adjacency matrix
+answer<-matrix(0, nrow=length(u), ncol=length(u))
+colnames(answer)<-u
+rownames(answer)<-u
+# Logic to create weighted matrix
+for(i in 1:length(Keyword_data$Keyword.2)){
+  temp<-unlist(Keyword_data[i,])
+  temp<-temp[!is.na(temp)]
+  keyword_list<-combn(temp,2)
+  for(j in 1:length(keyword_list[1,])){
+    rowind<-which(rownames(answer)==(keyword_list[1,j]))
+    colind<-which(colnames(answer)==(keyword_list[2,j]))
+    answer[rowind,colind]<-answer[rowind,colind]+1
+    answer[colind,rowind]<-answer[colind,rowind]+1
+  }
+}
+
+answer= answer[-157,-157]
+
+```
+
+```{r}
+
+#Calculate the adjacency matrix 
+adj <- graph_from_adjacency_matrix(answer, mode = "undirected" ,weighted = TRUE ) # For directed networks
+adj
+
+
+```
+
+```{r}
+#Calculating the egdes and nodes degree strength of the matrix
+V(adj)$name
+E(adj)$weight
+
+```
+
+```{r}
+# Task 3
+#Calculating degree
+kdeg= degree(adj,mode = "all")
+deg1=unname(kdeg)
+keywords= names(kdeg)
+df_deg = data.frame(keywords,deg1)
+
+#Calculating the strength
+kstr= strength(adj,mode = "all")
+str1=unname(kstr)
+keywords= names(kstr)
+df_str = data.frame(keywords,str1)
+```
+
+```{r}
+# T4
+#Calculate the top 10 degrees
+Top10_deg=head(arrange(df_deg,desc(df_deg$deg1)),10)
+#Top 10 strength
+Top10_str=head(arrange(df_str,desc(df_str$str1)),10)
+```
+
+```{r}
+# T5
+#Show the top 10 node pairs by weights
+weights=E(adj)$weight
+combs=attr(E(adj),"vnames")
+df_wt=data.frame(combs,weights)
+
+Top10_wt= head(arrange(df_wt,desc(df_wt$weights)),10)
+
+```
+
+```{r}
+
+#Task 6 
+
+#Calculating the average degree of the network 
+df_avgstr=merge(x= df_deg, y= df_str, by="keywords")
+sum_str= df_avgstr %>% group_by(deg1) %>% summarise(sum(str1))
+colnames(sum_str)= c("deg","sum_str")
+count_deg = df_avgstr %>% group_by(deg1) %>% count(deg1)
+avg_str = sum_str$sum_str/count_deg$n
+
+plot(sum_str$deg,avg_str)
+
+```
+
+
+
+
+
+
+
