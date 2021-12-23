@@ -1,0 +1,1237 @@
+---
+title: "R Notebook"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r}
+library(dendextend)
+library(plotly)
+library(dplyr)
+library(readr)
+library(magrittr)
+library(plotly)
+library(dplyr)
+library(NbClust)
+library(factoextra)
+library(tidyr)
+library(stringr)
+library(dplyr)
+library(scatterplot3d)
+library(plot3D)
+library(factoextra)
+```
+
+```{r}
+df <- read.csv("Data1.csv")
+df2 <- read.csv("Data2.csv")
+df3 <- read.csv("Data3.csv")
+df4 <- read.csv("Data4.csv")
+df5 <- read.csv("Data5.csv")
+df6 <- read.csv("Data6.csv")
+df7 <- read.csv("Data7.csv")
+df8 <- read.csv("Data8.csv")
+
+```
+
+```{r}
+#In the given dataset there are three coloumns X1, X2, X3 which are the attributes of the dataset, the class coloumns represents the data corressponding to the particular class, generally in supervised learning we have labelled data through which we can make further predictions. 
+
+#Since, we are working with unsupervised learning we do not need the last coloumn, by using k-means clustering we will be able to classify the data that we are working on
+
+#Let's say we are working on identifying the which gesture it is on the basis of accelerometer data, which contains aX, aY and aZ values using unsupervised learning we can figure what kind of gesture a person performs on the basis of the acceleronmeter values obtained from a sensor. 
+
+#First thing we need to find the k values which can represent the number of clusters:
+
+#There are two approaches 
+  #1. Using trial and error method
+  #2. Using elbow method
+
+#In trial and error method what we can do is to randomly select the centroids and then iterate through the loop untill all the samples are arranged into different grouping and then validate the model to evaluate it's performance
+
+#First thing we need to do is to figure out the proximity of the observations with the centroid
+
+#A better way of understanding can be done by plotting the dataset using scatterplot graph
+
+#since we are intrested in only the values and not the class we will drop that coloumn
+
+#to find the optimual number of clusters first we need to check the distribution of the data and see whether the dataset is a balanced or imbalanced dataset. 
+
+labels <- df$Class
+labels
+
+#Now we need only three columns hence we will select the first three columns
+
+df.data <- df[,-5]
+
+df.data1 <- df[,-1]
+df.data <- df[,-5]
+df.data_1 <- df.data[,-1]
+df.data_1
+
+#Checking whether the data is distributed evenly or not
+table(labels)
+#Here we can observe that there are 30 observations for each class except the first on which has 32 observations 
+
+#Now to figure out the number of clusters we use the elbow method to figure out the optimal number of clusters 
+
+
+#The first thing that we do is to scale the data (When units are different, not needed here.)
+
+#df.data_scaled <- scale(df.data_1)
+#df.data_scaled
+
+df_dist <- dist(df.data_1)
+df_dist
+
+#Visualising disimiliarity matrix
+fviz_dist(df_dist)
+
+#We can see here that the data has been scaled
+# Now to find the number of clusters we need to find out the total within ness sum of the clusters 
+
+```
+
+```{r}
+#Dataframe 2 
+
+labels_2 <- df2$Class
+labels_2
+
+#Now we need only three columns hence we will select the first three columns
+
+df2.data <- df2[,-5]
+
+df2.data1 <- df2[,-1]
+df2.data <- df2[,-5]
+df2.data_1 <- df2.data[,-1]
+df2.data_1
+
+#Checking whether the data is distributed evenly or not
+table(labels_2)
+#Here we can observe that there are 30 observations for each class except the first on which has 32 observations 
+
+#Now to figure out the number of clusters we use the elbow method to figure out the optimal number of clusters 
+plot(df2.data)
+
+#The first thing that we do is to scale the data (Is it needed?? Please find out)
+
+#df2.data_scaled <- scale(df2.data_1)
+#df2.data_scaled
+
+df2_dist <- dist(df2.data_1)
+df2_dist
+
+#Visualising disimiliarity matrix
+fviz_dist(df2_dist)
+```
+
+```{r}
+#Data3.csv
+
+labels_3 <- df3$Class
+labels_3
+
+#Now we need only three columns hence we will select the first three columns
+
+df3.data <- df3[,-5]
+
+df3.data1 <- df3[,-1]
+df3.data <- df3[,-5]
+df3.data_1 <- df3.data[,-1]
+df3.data_1
+
+#Checking whether the data is distributed evenly or not
+table(labels)
+#Here we can observe that there are 30 observations for each class except the first on which has 32 observations 
+
+#The first thing that we do is to scale the data 
+
+#df3.data_scaled <- scale(df3.data_1)
+#df3.data_scaled
+
+df3_dist <- dist(df3.data_1)
+df3_dist
+
+#Data3.csv
+labels_3 <- df3$Class
+labels_3
+
+#Now we need only three columns hence we will select the first three columns
+
+df3.data <- df3[,-5]
+
+df3.data1 <- df3[,-1]
+df3.data <- df3[,-5]
+df3.data_1 <- df3.data[,-1]
+df3.data_1
+
+#Checking whether the data is distributed evenly or not
+table(labels_3)
+#Here we can observe that there are 30 observations for each class except the first on which has 32 observations 
+
+#Now to figure out the number of clusters we use the elbow method to figure out the optimal number of clusters 
+plot(df3.data)
+
+#The first thing that we do is to scale the data (Is it needed?? Please find out)
+
+#df3.data_scaled <- scale(df3.data_1)
+#df3.data_scaled
+
+df3_dist <- dist(df3.data_1)
+df3_dist
+
+#Visualising disimiliarity matrix
+fviz_dist(df3_dist)
+
+```
+
+```{r}
+#Data4.csv
+labels <- df4$Class
+labels
+
+#Now we need only three columns hence we will select the first three columns
+
+df4.data <- df4[,-5]
+
+df4.data1 <- df4[,-1]
+df4.data <- df4[,-5]
+df4.data_1 <- df4.data[,-1]
+df4.data_1
+
+#Checking whether the data is distributed evenly or not
+table(labels)
+#Here we can observe that there are 30 observations for each class except the first on which has 32 observations 
+
+#Now to figure out the number of clusters we use the elbow method to figure out the optimal number of clusters 
+#plot(df4.data)
+
+#The first thing that we do is to scale the data 
+
+#df4.data_scaled <- scale(df4.data_1)
+#df4.data_scaled
+
+df4_dist <- dist(df4.data_1)
+df4_dist
+
+fviz_dist(df4_dist)
+
+```
+
+```{r}
+#Data5.csv
+labels <- df5$Class
+labels
+
+#Now we need only three columns hence we will select the first three columns
+
+df5.data <- df5[,-5]
+
+df5.data1 <- df5[,-1]
+df5.data <- df5[,-5]
+df5.data_1 <- df5.data[,-1]
+df5.data_1
+
+#Checking whether the data is distributed evenly or not
+
+
+table(labels)
+#Here we can observe that there are 30 observations for each class except the first on which has 32 observations 
+
+#Now to figure out the number of clusters we use the elbow method to figure out the optimal number of clusters 
+#plot(df5.data)
+
+#The first thing that we do is to scale the data (Is it needed?? Please find out)
+
+#df5.data_scaled <- scale(df5.data_1)
+
+
+df5_dist <- dist(df5.data_1)
+
+#Visualising the similarity matrix
+fviz_dist(df5_dist)
+
+```
+
+```{r}
+#Data6.csv
+labels <- df6$Class
+labels
+
+#Now we need only three columns hence we will select the first three columns
+
+df6.data <- df6[,-5]
+
+df6.data1 <- df6[,-1]
+df6.data <- df6[,-5]
+df6.data_1 <- df6.data[,-1]
+df6.data_1
+
+#Checking whether the data is distributed evenly or not
+table(labels)
+#Here we can observe that there are 30 observations for each class except the first on which has 32 observations 
+
+#Now to figure out the number of clusters we use the elbow method to figure out the optimal number of clusters 
+#plot(df6.data)
+
+
+#df6.data_scaled <- scale(df6.data_1)
+#df6.data_scaled
+
+df6_dist <- dist(df6.data_1)
+
+#fviz_dist(df6_dist)
+
+```
+
+```{r}
+#Data7.csv
+labels <- df7$Class
+labels
+
+#Now we need only three columns hence we will select the first three columns
+
+df7.data <- df7[,-5]
+
+df7.data1 <- df7[,-1]
+df7.data <- df7[,-5]
+df7.data_1 <- df7.data[,-1]
+df7.data_1
+
+#Checking whether the data is distributed evenly or not
+table(labels)
+#Here we can observe that there are 30 observations for each class except the first on which has 32 observations 
+
+#Now to figure out the number of clusters we use the elbow method to figure out the optimal number of clusters 
+plot(df7.data)
+
+#The first thing that we do is to scale the data (Is it needed?? Please find out)
+
+#df7.data_scaled <- scale(df7.data_1)
+#df7.data_scaled
+
+df7_dist <- dist(df7.data_1)
+df7_dist
+
+
+fviz_dist(df7_dist)
+
+```
+
+```{r}
+#Data8.csv
+labels <- df8$Class
+labels
+
+#Now we need only three columns hence we will select the first three columns
+
+df8.data <- df8[,-5]
+
+df8.data1 <- df8[,-1]
+df8.data <- df8[,-5]
+df8.data_1 <- df8.data[,-1]
+df8.data_1
+
+#Checking whether the data is distributed evenly or not
+table(labels)
+
+#df8_dist <- dist(df8.data_1)
+
+#fviz_dist(df8_dist)
+```
+
+
+```{r}
+#function to find the optimal number clusters using different methods
+nbclust_viz <- function(dataFrame,method, subtitle) {
+  fviz_nbclust(dataFrame, kmeans, method) + labs(subtitle)
+}
+
+#Data1
+#Elbow method
+nbclust_viz(df.data_1, "wss","Elbow Method")
+
+#Silhotte Method
+nbclust_viz(df.data_1, "silhouette","Silhouette Method")
+
+#Data2
+#Elbow method
+nbclust_viz(df2.data_1, "wss","Elbow Method")
+
+#Silhotte Method
+nbclust_viz(df2.data_1, "silhouette","Silhouette Method")
+
+#Data3
+#Elbow method
+nbclust_viz(df3.data_1, "wss","Elbow Method")
+
+#Silhotte Method
+nbclust_viz(df3.data_1, "silhouette","Silhouette Method")
+
+#Data4
+#Elbow method
+nbclust_viz(df4.data_1, "wss","Elbow Method")
+
+#Silhotte Method
+nbclust_viz(df4.data_1, "silhouette","Silhouette Method")
+
+#Data5
+#Elbow method
+nbclust_viz(df5.data_1, "wss","Elbow Method")
+
+#Silhotte Method
+nbclust_viz(df5.data_1, "silhouette","Silhouette Method")
+
+#Data6
+#Elbow method
+nbclust_viz(df6.data_1, "wss","Elbow Method")
+
+#Silhotte Method
+nbclust_viz(df6.data_1, "silhouette","Silhouette Method")
+
+#Data7
+#Elbow method
+nbclust_viz(df7.data_1, "wss","Elbow Method")
+
+#Silhotte Method
+nbclust_viz(df7.data_1, "silhouette","Silhouette Method")
+
+#Data8
+#Elbow method
+nbclust_viz(df8.data_1, "wss","Elbow Method")
+
+#Silhotte Method
+nbclust_viz(df8.data_1, "silhouette","Silhouette Method")
+
+```
+
+
+```{r}
+#Data1.csv
+
+#Applying the k-means function
+
+km.out <- kmeans(df.data_1 , centers = 7, nstart = 20)
+km.out
+
+df.cluster <- km.out$cluster
+df.cluster
+
+df$clustered <- df.cluster
+df <- df[,-7]
+df
+
+#Data2.csv
+
+#Applying the k-means function
+
+km.out2 <- kmeans(df2.data_1 , centers = 4, nstart = 20)
+km.out2
+
+#We need to find out the similarity matrix which is also called the total within sum of square 
+
+df2.cluster <- km.out2$cluster
+df2.cluster
+
+df2$clustered <- df2.cluster
+df2
+
+#Data3.csv
+#Applying the k-means function
+
+km.out3 <- kmeans(df3.data_1 , centers = 4, nstart = 20)
+km.out3
+
+#We need to find out the similarity matrix which is also called the total within sum of square 
+
+df3.cluster <- km.out3$cluster
+df3.cluster
+
+df3$clustered <- df3.cluster
+df3
+
+#Data4.csv
+
+#Applying the k-means function
+
+km.out4 <- kmeans(df4.data_1 , centers = 6, nstart = 20)
+km.out4
+
+#We need to find out the similarity matrix which is also called the total within sum of square 
+
+df4.cluster <- km.out4$cluster
+df4.cluster
+
+df4$clustered <- df4.cluster
+df4
+
+#Data5.csv
+#Applying the k-means function
+
+km.out5 <- kmeans(df5.data_1 , centers = 4, nstart = 20)
+km.out5
+
+#We need to find out the similarity matrix which is also called the total within sum of square 
+
+df5.cluster <- km.out5$cluster
+df5.cluster
+
+df5$clustered <- df5.cluster
+df5
+
+#Data6.csv
+#Applying the k-means function
+
+km.out6 <- kmeans(df6.data_1 , centers = 6, nstart = 20)
+km.out6
+
+#We need to find out the similarity matrix which is also called the total within sum of square 
+
+df6.cluster <- km.out6$cluster
+df6.cluster
+
+df6$Class
+
+df6$Clustered <- df6.cluster
+df6
+
+#Data7.csv
+#Applying the k-means function
+
+km.out7 <- kmeans(df7.data_1 , centers = 1, nstart = 20)
+km.out7
+
+df7.cluster <- km.out7$cluster 
+df7$cluster <- km.out7$cluster
+
+df7.cluster
+
+#Data8.csv
+#Applying the k-means function
+
+table(df8$Class)
+km.out8 <- kmeans(df8.data_1 , centers = 1, nstart = 20)
+df8$cluster <- km.out8$cluster
+
+
+
+
+```
+```{r}
+
+#Question 2 Performance Evaluation using external validation method
+
+library(ClusterR)
+library(cluster)
+
+g1 <- sample(df$Class)
+g2 <- sample(df$clustered)
+
+#Validation is used to find out the tendency of the model to cluster the given data based on similarity or not, since we already have ground_truth_labels assigned to it, we are using the supervised validation approach which is External validation method
+
+#TO find the model evaluation we first validate our model using the jaccard_index, jaccard_index, matches the value and then finds out the percentage of values between the clustered labels and ground truth labels. It basically does intersection over union, where it will find total number of matching values / total number of rows.
+val_1 <- external_validation(g1, g2, method = "jaccard_index")
+
+#Rand index is finding the percentage of decision that is correct so the clustered values that have been obtained after clustering if they match with the given clusters then the decision made is right.
+val_2 <- external_validation(g1, g2, method = "rand_index")
+
+val_1
+val_2
+
+#Data2 
+g1_2 <- sample(df2$Class)
+g2_2 <- sample(df2$clustered)
+
+val_1_2 <- external_validation(g1_2, g2_2, method = "jaccard_index")
+
+val_2_2 <- external_validation(g1_2, g2_2, method = "rand_index")
+
+val_1_2
+val_2_2
+#Data3.csv
+
+g1_3 <- sample(df3$Class)
+g2_3 <- sample(df3$clustered)
+
+
+
+val_1_3 <- external_validation(g1, g2, method = "jaccard_index")
+
+
+val_2_3 <- external_validation(g1, g2, method = "rand_index")
+
+val_1_3
+val_2_3
+
+#Data4.csv
+g1_4 <- sample(df4$Class)
+g2_4 <- sample(df4$clustered)
+
+
+
+val_1_4 <- external_validation(g1_4, g2_4, method = "jaccard_index")
+
+
+val_2_4 <- external_validation(g1_4, g2_4, method = "rand_index")
+
+val_1_4
+val_2_4
+
+#Data5.csv
+df5
+g1_5 <- sample(df5$Class)
+g2_5 <- sample(df5$clustered)
+g2_5
+
+val_1_5 <- external_validation(g1_5, g2_5, method = "jaccard_index")
+
+
+val_2_5 <- external_validation(g1_5, g2_5, method = "rand_index")
+
+val_1_5
+val_2_5
+
+#Data6.csv
+
+df6
+g1_6 <- sample(df6$Class)
+g2_6 <- sample(df6$Clustered)
+
+val_1_6 <- external_validation(g1_6, g2_6, method = "jaccard_index")
+
+val_2_6 <- external_validation(g1_6, g2_6, method = "rand_index")
+
+val_1_6
+val_2_6
+
+#Data7.csv
+g1_7 <- sample(df7$Class)
+g2_7 <- sample(df7$cluster)
+
+g2_7
+
+val_1_7 <- external_validation(g1_7, g2_7, method = "jaccard_index")
+
+val_2_7 <- external_validation(g1_7, g2_7, method = "rand_index")
+
+val_1_7
+val_2_7
+
+#Data8
+
+
+
+g1_8 <- sample(df8$Class)
+g2_8 <- sample(df8$cluster)
+
+val_1_8 <- external_validation(g1_8, g2_8, method = "jaccard_index")
+
+val_2_8 <- external_validation(g1_8, g2_8, method = "rand_index")
+
+val_1_8
+val_2_8
+
+```
+
+```{r}
+#Data1.csv
+#Visualising the performance evaluation using confusion matrix
+
+conf_matrix <- table(df$Class, df$clustered)
+conf_matrix
+
+#Data2.csv
+#Visualising the performance evaluation using confusion matrix
+
+conf_matrix2 <- table(df2$Class, df2$clustered)
+conf_matrix2
+
+#Data3.csv
+conf_matrix3 <- table(df3$Class, df3$clustered)
+conf_matrix3
+
+#Data4.csv
+conf_matrix4 <- table(df4$Class, df4$clustered)
+conf_matrix4
+
+#Data5.csv
+conf_matrix5 <- table(df5$Class, df5$clustered)
+conf_matrix5
+
+#Data6.csv
+conf_matrix6 <- table(df6$Class, df6.cluster)
+conf_matrix6
+
+#Data7.csv
+conf_matrix7 <- table(df7$Class, df7$cluster)
+conf_matrix7
+
+#Data8
+
+conf_matrix8 <- table(df8$Class, df8$cluster)
+conf_matrix8
+
+```
+
+```{r}
+#Data1.csv
+#Question 3 
+fviz_cluster(list(data = df.data_1, cluster = df$Class))
+
+#Data2.csv
+fviz_cluster(list(data = df2.data_1, cluster = df2$Class))
+
+#Data3.csv
+fviz_cluster(list(data = df3.data_1, cluster = df3$Class))
+
+#Data4.csv
+fviz_cluster(list(data = df4.data_1, cluster = df4$Class))
+
+#Data5.csv
+fviz_cluster(list(data = df5.data_1, cluster = df5$Class))
+
+#Data6.csv
+fviz_cluster(list(data = df6.data_1, cluster = df6$Class))
+
+#Data7.csv
+fviz_cluster(list(data = df7.data_1, cluster = df7$Class))
+
+```
+
+#Task 1 - Using Hirearchial Clustering
+```{r}
+
+#Data1.csv
+#Loading the  data frame
+Data1 <- read.csv("Data1.csv")
+
+d1 <- dist(Data1[,2:4]) 
+#Hierarchial clustering using Single Linkage method
+hc_d1 <- hclust(d1, method = "single")
+
+#Creating a dendomgram
+dend_d1 <- as.dendrogram(hc_d1)
+
+#Adding different colors to each cluster in the dendogram
+dend_d1 <- color_branches(dend_d1, k=7)
+
+#Addding value labels to the clusters and adjusting the size
+dend_d1 <- set(dend_d1, "labels_cex", 0.3)
+
+#plotting the dendogram
+plot(dend_d1)
+
+#Cutting dedogram (tree) to find the number of classes to separate by color in the 3d plot
+cut_tree_d1 <- cutree(dend_d1, k = 9)
+
+phc1<- fviz_cluster(list(data = Data1, cluster = cut_tree_d1))
+phc1
+
+
+plot_d1<- plot_ly(x= Data1$X1, y=Data1$X2, z=Data1$X3, type = "scatter3d", mode="markers", color = as.factor(cut_tree_d1))%>%
+  layout(title = " Observations plotted with Hierarchial clustering")
+plot_d1
+
+```
+
+```{r}
+#Loading the  data frame
+Data2 <- read.csv("Data2.csv")
+
+d2 <- dist(Data2[,2:4]) 
+#Hierarchial clustering using Single Linkage method
+hc_d2 <- hclust(d2, method = "single")
+
+#Creating a dendomgram
+dend_d2 <- as.dendrogram(hc_d2)
+
+#Adding different colors to each cluster in the dendogram
+dend_d2 <- color_branches(dend_d2, k=4)
+
+#Addding value labels to the clusters and adjusting the size
+dend_d2 <- set(dend_d2, "labels_cex", 0.3)
+
+#plotting the dendogram
+plot(dend_d2)
+
+#Cutting dedogram (tree) to find the number of classes to separate by color in the 3d plot
+cut_tree_d2 <- cutree(dend_d2, k = 4)
+
+
+phc2<- fviz_cluster(list(data = Data2[,-1], cluster = cut_tree_d2))
+phc2
+
+
+plot_d2<- plot_ly(x= Data2$X, y=Data2$Y, z=Data2$C, type = "scatter3d", mode="markers", color = as.factor(cut_tree_d2))%>%
+  layout(title = " Observations plotted with Hierarchial clustering")
+plot_d2
+```
+
+```{r}
+#Loading the  data frame
+Data3 <- read.csv("Data3.csv")
+
+d3 <- dist(Data3[,2:4]) 
+#Hierarchial clustering using Single Linkage method
+hc_d3 <- hclust(d3, method = "single")
+
+#Creating a dendomgram
+dend_d3 <- as.dendrogram(hc_d3)
+
+#Adding different colors to each cluster in the dendogram
+dend_d3 <- color_branches(dend_d3, k=4)
+
+#Addding value labels to the clusters and adjusting the size
+dend_d3 <- set(dend_d3, "labels_cex", 0.3)
+
+#plotting the dendogram
+plot(dend_d3)
+
+#Cutting dedogram (tree) to find the number of classes to separate by color in the 3d plot
+cut_tree_d3 <- cutree(dend_d3, k =4)
+
+phc3<- fviz_cluster(list(data = Data3, cluster = cut_tree_d3))
+phc3
+
+
+
+plot_d3<- plot_ly(x= Data3$X1, y=Data3$X2, z=Data3$X3, type = "scatter3d", mode="markers", color = as.factor(cut_tree_d3))%>%
+  layout(title = " Observations plotted with Hierarchial clustering")
+plot_d3
+```
+
+```{r}
+
+#Data4.csv
+#Loading the  data frame
+Data4 <- read.csv("Data4.csv")
+
+d4 <- dist(Data4[,2:4]) 
+#Hierarchial clustering using Single Linkage method
+hc_d4 <- hclust(d4, method = "single")
+
+#Creating a dendomgram
+dend_d4 <- as.dendrogram(hc_d4)
+
+#Adding different colors to each cluster in the dendogram
+dend_d4 <- color_branches(dend_d4, k=2)
+
+#Addding value labels to the clusters and adjusting the size
+dend_d4 <- set(dend_d4, "labels_cex", 0.3)
+
+#plotting the dendogram
+plot(dend_d4)
+
+#Cutting dedogram (tree) to find the number of classes to separate by color in the 3d plot
+cut_tree_d4 <- cutree(dend_d4, k =2)
+
+
+phc4<- fviz_cluster(list(data = Data3, cluster = cut_tree_d3))
+phc4
+
+
+plot_d4<- plot_ly(x= Data4$X1, y=Data4$X2, z=Data4$X3, type = "scatter3d", mode="markers", color = as.factor(cut_tree_d4))%>%
+  layout(title = " Observations plotted with Hierarchial clustering")
+plot_d4
+```
+
+```{r}
+#Loading the  data frame
+Data5 <- read.csv("Data5.csv")
+
+d5 <- dist(Data5[,2:4]) 
+#Hierarchial clustering using Single Linkage method
+hc_d5 <- hclust(d5, method = "single")
+
+#Creating a dendomgram
+dend_d5 <- as.dendrogram(hc_d5)
+
+#Adding different colors to each cluster in the dendogram
+dend_d5 <- color_branches(dend_d5, k=2)
+
+#Addding value labels to the clusters and adjusting the size
+dend_d5 <- set(dend_d5, "labels_cex", 0.3)
+
+#plotting the dendogram
+plot(dend_d5)
+
+#Cutting dedogram (tree) to find the number of classes to separate by color in the 3d plot
+cut_tree_d5 <- cutree(dend_d5, k =2)
+
+
+phc5<- fviz_cluster(list(data = Data5, cluster = cut_tree_d5))
+phc5
+
+plot_d5<- plot_ly(x= Data5$X1, y=Data5$X2, z=Data5$X3, type = "scatter3d", mode="markers", color = as.factor(cut_tree_d5))%>%
+  layout(title = " Observations plotted with Hierarchial clustering")
+plot_d5
+```
+
+```{r}
+#Loading the  data frame
+Data6 <- read.csv("Data6.csv")
+
+d6 <- dist(Data6[,2:4]) 
+#Hierarchial clustering using Single Linkage method
+hc_d6 <- hclust(d6, method = "single")
+
+#Creating a dendomgram
+dend_d6 <- as.dendrogram(hc_d6)
+
+#Adding different colors to each cluster in the dendogram
+dend_d6 <- color_branches(dend_d6, k=2)
+
+#Addding value labels to the clusters and adjusting the size
+dend_d6 <- set(dend_d6, "labels_cex", 0.3)
+
+#plotting the dendogram
+plot(dend_d6)
+
+#Cutting dedogram (tree) to find the number of classes to separate by color in the 3d plot
+cut_tree_d6 <- cutree(dend_d6, k =2)
+
+phc6<- fviz_cluster(list(data = Data6, cluster = cut_tree_d6))
+phc6
+
+
+plot_d6<- plot_ly(x= Data6$X1, y=Data6$X2, z=Data6$X3, type = "scatter", mode="markers", color = as.factor(cut_tree_d6))%>%
+  layout(title = " Observations plotted with Hierarchial clustering")
+plot_d6
+```
+
+```{r}
+#Loading the  data frame
+Data7 <- read.csv("Data7.csv")
+
+d7 <- dist(Data7[,2:4]) 
+#Hierarchial clustering using Single Linkage method
+hc_d7 <- hclust(d7, method = "single")
+
+#Creating a dendomgram
+dend_d7 <- as.dendrogram(hc_d7)
+
+#Adding different colors to each cluster in the dendogram
+dend_d7 <- color_branches(dend_d7, k=6)
+
+#Addding value labels to the clusters and adjusting the size
+dend_d7 <- set(dend_d7, "labels_cex", 0.3)
+
+#plotting the dendogram
+plot(dend_d7)
+
+#Cutting dedogram (tree) to find the number of classes to separate by color in the 3d plot
+cut_tree_d7 <- cutree(dend_d7, k =6)
+
+phc7<- fviz_cluster(list(data = Data7, cluster = cut_tree_d7))
+phc7
+
+
+plot_d7<- plot_ly(x= Data7$X1, y=Data7$X2, type = "scatter", mode="markers", color = as.factor(cut_tree_d7))%>%
+  layout(title = " Observations plotted with Hierarchial clustering")
+plot_d7
+```
+
+```{r}
+#Loading the  data frame
+Data8 <- read.csv("Data8.csv")
+Data8
+
+row_sub = apply(Data8, 1, function(row) all(row !=0 ))
+Data8 <- Data8[row_sub,]
+
+d8 <- Data8[,2:4]
+d8
+
+d8 <- dist(d8) 
+
+
+#Hierarchial clustering using Single Linkage method
+hc_d8 <- hclust(d8, method = "single")
+
+
+#Creating a dendomgram
+dend_d8 <- as.dendrogram(hc_d8)
+
+#Adding different colors to each cluster in the dendogram
+dend_d8 <- color_branches(dend_d8, k=1)
+
+#Addding value labels to the clusters and adjusting the size
+dend_d8 <- set(dend_d8, "labels_cex", 0.1)
+
+#plotting the dendogram
+plot(dend_d8)
+
+#Cutting dedogram (tree) to find the number of classes to separate by color in the 3d plot
+cut_tree_d8 <- cutree(dend_d8, k =1)
+
+plot_d8<- plot_ly(x= Data8$X1, y=Data8$X2, z=Data8$X3, type = "scatter3d", mode="markers", color = as.factor(cut_tree_d8))%>%
+  layout(title = " Observations plotted with Hierarchial clustering")
+plot_d8
+```
+
+##Task 2
+World Indicators
+
+```{r}
+#Importing the Data Set
+
+World_Indicators <- read.csv("World Indicators Final.csv")%>%
+  drop_na()
+
+
+World_Indicators2 <- World_Indicators[,-18]
+rownames(World_Indicators2) <- World_Indicators[,18]
+
+World_Indicators <- World_Indicators2[,-17]
+World_Indicators
+
+World_Indicators2 <- World_Indicators2[,-17]
+World_Indicators2
+
+```
+
+```{r}
+#Scaling the data
+
+World_Indicators <- scale(World_Indicators)
+head(World_Indicators)
+
+distance <- get_dist(World_Indicators)
+fviz_dist(distance, gradient = list(low = "#00AFBB", mid = "white", high = "#FC4E07"))
+
+```
+
+```{r}
+#K-means Clustering
+
+
+#Using elbow method to determine the optimal number of cluster
+fviz_nbclust((World_Indicators), kmeans, method = "silhouette") + labs(subtitle = "Elbow Method")
+
+
+#We can see that the elbow point is at 2.
+k_WI <- kmeans(World_Indicators, centers = 3, nstart = 25)
+str(k_WI)
+
+#Visualizing the Cluster plot
+fviz_cluster(k_WI, data = World_Indicators)
+
+
+#Visualizing the Cluster plot
+
+fviz_cluster(k_WI, data = World_Indicators)
+
+
+```
+
+```{r}
+#Determining the clusters based on columns that contribute to the development
+
+x<- select(World_Indicators2,Health.Exp...GDP,Health.Exp.Capita,Infant.Mortality.Rate, Mobile.Phone.Usage, Internet.Usage)
+x <- scale(x)
+distance <- get_dist(x)
+
+
+#Optimal Clusters 
+
+fviz_nbclust(x, kmeans, method = "wss") + labs(subtitle = "Elbow Method")
+
+wd1.dist <- dist(x)
+
+fviz_dist(wd1.dist)
+
+#K-means clustering
+k_x <- kmeans(x, centers = 3, nstart = 1)
+k_x
+
+str(k_x)
+
+k_x
+
+
+#Visualizing the Cluster plot
+fviz_cluster(k_x, data = x)
+
+```
+
+
+```{r}
+#Hierarchial Clustering
+# For all columns in the data set
+hc_d_WI <- dist(World_Indicators) 
+#Hierarchial clustering using Single Linkage method
+hc_WI <- hclust(hc_d_WI, method = "single")
+
+#Creating a dendrogram
+dend_WI <- as.dendrogram(hc_WI)
+
+sub_grp <- cutree(dend_WI, k = 2)
+
+plot(dend_WI)
+
+fviz_cluster(list(data = World_Indicators, cluster = sub_grp))
+
+
+```
+
+```{r}
+#Hierarchial Clustering based on columns that contribute to the development
+
+hc_d_x <- dist(x) 
+#Hierarchial clustering using Single Linkage method
+hc_x <- hclust(hc_d_x, method = "single")
+hc_x
+#Creating a dendrogram
+dend_x <- as.dendrogram(hc_x)
+
+sub_grpx <- cutree(dend_x, k = 2)
+sub_grpx
+
+plot(dend_x)
+fviz_cluster(list(data = World_Indicators, cluster = sub_grpx))
+
+library(clValid)
+
+dunn(hc_d_x,sub_grpx,hc_x ,method = "centroid")
+
+```
+
+
+#Task 2 - part b
+```{r}
+
+#Internal Validation
+
+#1 - for the entire data set
+## Internal Validation for K-means - World Indicators dataset
+intern <- clValid(World_Indicators, 2:3, clMethods=c("hierarchical","kmeans"),
+validation="internal")
+summary(intern)
+
+#2 - for factors/columns contributing the development of the country
+## Internal Validation for K-means - Selected Columns
+intern_x <- clValid(x , 2:3, clMethods=c("hierarchical","kmeans"),
+validation="internal")
+summary(intern_x)
+
+
+```
+
+
+
+#Task 2 - part c
+
+```{r}
+
+## Report the best clustering solution
+
+#k-means is the best clustering solution
+#1. It is sensitive to outliers, here the observation USA is considered to be an outlier since it has the highest GDP rate
+#2. Plotting the clusters using the hierarchial clustering makes no sense, whereas k-means does
+#3. The optimal number of clusters are selected on the basis of which countries are capable enough to run a vaccination camapaign which means that they will be able to run a successful campagin on the basis of the Health Care Budget Mobile Phone Usage and other features as well. 
+
+##Give a detailed list of all the groups and the countries included within the groups
+
+#detailed list of countries in each cluster - World Indicators entire data set
+
+clusters <- k_WI$cluster
+clusters <- data.frame(clusters)
+countries <- clusters%>%
+  arrange(clusters)
+countries
+
+#detailed list of countries in each cluster - with factors/columns affecting the development of a country
+
+clusters_x <- k_x$cluster
+clusters_x <- data.frame(clusters_x)
+countries_x <- clusters_x%>%
+  arrange(clusters_x)
+countries_x
+
+
+```
+
+```{r}
+#Merging the Cluster Class to the World Indicators Data Frame
+
+WI_class <- merge(World_Indicators2,clusters,by='row.names', all=TRUE)
+WI_class <- rename(WI_class,class=clusters)
+WI_class
+```
+
+
+#Task 2 , Part 4
+
+```{r}
+#Scatter Plot A
+
+plot_WI_a<- plot_ly(x= WI_class$Health.Exp.Capita, y=WI_class$Life.Expectancy.Male, type = "scatter", mode="markers", name = 'Male', color = as.factor(WI_class$class))%>%
+  layout(title = "Health Expenditure per Capita v/s Life Expectancy")
+plot_WI_a <- plot_WI_a %>%
+  add_trace(y=WI_class$Life.Expectancy.Female, type = "scatter", mode="markers", name= 'Female', color = as.factor(WI_class$class))
+  
+plot_WI_a
+  
+```
+
+#Life expectancy for both males and females in coutries that hacve a high Health expenditure per Capita is relatively higher. For all these countries, the life expectancy is above 75 years of age. We also see that for most of these countries, the life expectancy of females is higher than males.
+
+
+
+```{r}
+#Scatter Plot B
+
+plot_WI_2<- plot_ly(y= WI_class$Birth.Rate, x=WI_class$Health.Exp.Capita, type = "scatter", mode="markers",color = as.factor(WI_class$class))%>%
+  layout(title = "Birth rate v/s Health.Exp.Capita")
+plot_WI_2
+```
+##We observe that for countries that have high Health Expenditure per Capita, the birth rate much lower than average.
+
+
+```{r}
+#Scatter Plot 3
+
+plot_WI_3<- plot_ly(y= WI_class$Internet.Usage, x=WI_class$Mobile.Phone.Usage, type = "scatter", mode="markers",color = as.factor(WI_class$class))%>%
+  layout(title = "Internet Usage v/s Mobile Phone Usage")
+plot_WI_3
+
+```
+#From the above plot we see that there is a positive correlation between mobile phone usage and internet usage. For each country as a point on the chart, we see that countries with higher mobile usage have a higher internet usage and countries with lower mobile usage have a lower internet usage.
+
+```{r}
+#Scatter Plot 4
+
+plot_WI_4<- plot_ly(x= WI_class$Health.Exp.Capita, y=WI_class$Infant.Mortality.Rate, type = "scatter", mode="markers",color = as.factor(WI_class$class))%>%
+  layout(title = "Health Expenditure per Capita v/s Infant mortality rate")
+plot_WI_4
+
+```
+#For countries with high health expenditure per capita, the infant mortality rate is much lower. Overall we see a general trend that as the health expenditure per Capita for a country increases, the Infant mortality rate decreases.
+
+```{r}
+plot_WI_5<- plot_ly(x= WI_class$Birth.Rate, y=WI_class$Infant.Mortality.Rate, type = "scatter", mode="markers",color = as.factor(WI_class$class))%>%
+  layout(title = "Birth Rate v/s Infant Mortality rate")
+plot_WI_5
+```
+#We know that both birth rate and infant mortality rate are key indicators to the development of a country. Infant mortality rate is high for the countries that have a high birth rate and is low for the countries that have low birth rate. This means that, the blue and green dots majorly represent countries that are developed or developing while the orange dots represent countries that are under-developed.
+
+
+
+```{r}
+#GDP vs Life Expectancy
+
+plot_WI_1<- plot_ly(x= WI_class$GDP, y=WI_class$Life.Expectancy.Male, type = "scatter", mode="markers", name = 'Male', color = as.factor(WI_class$class))%>%
+  layout(title = "GDP v/s Life Expectancy")
+plot_WI_1 <- plot_WI_1 %>%
+  add_trace(y=WI_class$Life.Expectancy.Female, type="scatter", mode="markers", name='Female', color = as.factor(WI_class$class))
+plot_WI_1
+```
+
+#### From the graphs we can see that countries having higher GDP and higher healthcare expenditure and mobile phone usage, it will be significantly easy to run a successful healthcare campagin, here the however in the countries which belong to group 2 have higher mobile phone usage however less health care expenditure%GDP which shows that it will be significanlty easier for the organisation to spread the awareness about the healthcare campagin, however substantial fundings will be required to launch a campaign successfully. 
+#### The countries belonging to group 3 will have fundings which have higher mobile phone usage, high healthcare expenditure per capita and median health care expenditure%GDP. 
+
+
+

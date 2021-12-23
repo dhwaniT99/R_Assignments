@@ -1,0 +1,86 @@
+---
+title: "R Notebook"
+output:
+  html_notebook: default
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+```{r}
+
+library(dplyr)
+library(tidyr)
+library(stringr) 
+library(bit64)
+library(factoextra)
+library(spec)
+
+
+wd <- read.csv('~/Desktop/FDA Project 1/World_Indicators.csv')
+wd
+
+#First thing there is inconsistency in the dataset as all the atributes are not of the same datatype. Hence applying the clustering algorithm will not work. 
+#First thing we need to convert the variables which have the datatype of character. Hence, we need to first convert the dataset into same datatype. 
+
+#We have function called to convert the character datatype into numeric datatype
+
+#there are a lot of NA values in this dataset
+#Following things cannot be done
+#1. Clustering algorithm cannot be applied to k-means value
+#2. datatype conversion is not possibleExtends
+
+#Hence, the first thing we will do is to drop the NA values. there are various functions in which we drop the NA values, 
+
+#We are using is.na() function where the function will return all the values except for NA. 
+
+
+#Find which columns have NA values and then return those those column names
+
+wd <- wd[,-c(4,11)]
+wd
+
+wd <-  drop_na(wd)
+wd
+dim(wd)
+
+wd$Business.Tax.Rate <- str_replace(wd$Business.Tax.Rate, '%', '')
+wd
+
+wd$GDP <- str_replace(wd$GDP, '[$]', '')
+wd
+
+#dropping the coma values
+
+wd$GDP <- gsub(",","",wd$GDP)
+wd$GDP
+
+wd[!(is.na(wd$GDP) | wd$start_pc==""), ]
+wd
+
+wd$GDP
+
+#converting character to numeric datatype
+wd$GDP <- as.double(wd$GDP)
+wd
+
+#removing $ values
+wd$Health.Exp.Capita <- gsub("[$]","",wd$Health.Exp.Capita)
+wd
+
+#converting double to integer
+wd$Health.Exp.Capita <- as.double(wd$Health.Exp.Capita)
+wd$Health.Exp.Capita
+
+#double values to integer values
+#wd1$`Business Tax Rate` <- as.double(wd1$`Business Tax Rate`)
+#typeof(wd1$`Business Tax Rate`)
+
+#Dropping region and country coloumn
+
+wd <- subset(wd, select = -c(19:20))
+wd
+
+write.csv(wd,'~/Desktop/FDA Project 1/World_Indicators.Final.csv')
+```
+
