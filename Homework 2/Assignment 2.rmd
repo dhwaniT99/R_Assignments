@@ -1,0 +1,771 @@
+---
+title: "Assignment 2"
+author: "Dhwani Kirankumar Trivedi, Ankita Ajit Dodhihal, Miraj Bhimani"
+date: "9/25/2021"
+output: html_document
+---
+
+```{r}
+#Question 1 Generate a vector  x<-1:1000
+user <-  function(n){
+  x <- c(1:n)
+}
+x <- user(1000)
+x
+```
+
+```{r}
+#Question 2
+x = 1:10
+length(x)
+for (i in 1:length(x)){
+  print(i)
+}
+```
+
+```{r}
+#Question 3
+x =  c(1:10)
+for (i in x[]){
+  i = i*2
+  print(i)
+}
+```
+
+```{r}
+#Question 4
+x =  c(1:10)
+t1 = Sys.time()
+for (i in x[]){
+  i = i*2
+  print(i)
+}
+t2 <- Sys.time()
+ct <- t2-t1
+print(paste("The computation time is " ,ct))
+```
+```{r}
+#Question 5
+user <-  function(n){
+  x = c(1:n)
+  x <- x*2
+  
+}
+t3 <- Sys.time()
+user(10)
+t4 <- Sys.time()
+t4-t3
+
+
+```
+
+```{r}
+#Question 7 
+#For x <- 1:100000
+t3 <- Sys.time()
+user(100000)
+t4 <- Sys.time()
+t4-t3
+
+```
+
+
+---
+#Question 1.8 Solved by Ankita Dodhihal Dhwani Trivedi Miraj Bhimani
+
+#The following observations have been recorded for vector length 
+#1. The computation time for the vector length 10000 is 0.008435965 secs.
+#2. The computation time for the vector length 100000 is 0.02526903 secs. 
+#3. The computation time for the vector length 1000000 is 0.02483988 secs. 
+
+It can be clearly observed that the the effect of vector length is directly proportional to the computation time. 
+It also represents that the CPU time will be linearly grow with respect to the vector length.
+representation of the computation time can be done using Big O Notation as well i.e. O(1)
+
+#Effect of for loop on computation time.
+
+It can be observed that the for loop iterates n times. 
+The computation time will be T(n) = O(n) n nano seconds and the CPU time will grow linearly with respect to program variable n.
+---
+
+
+```{r}
+#For x 100000
+
+t3 <- Sys.time()
+user(100000)
+t4 <- Sys.time()
+t4-t3
+```
+
+```{r}
+t3 <- Sys.time()
+user(100000)
+t4 <- Sys.time()
+c<-t4-t3
+
+```
+
+```{r}
+#Question 2.1
+# Solved by Ankita Dodihal Dhwani Trivedi Miraj Bhimani
+library(dplyr)
+rows <- 1:1000
+cols <- 1:10000
+#Generate a random dataframe
+df <- data.frame(rows,cols)
+df
+
+frac_rows <- function(df, n){
+  if(is.numeric(n)){
+  print("The sample is")
+  }
+  else{
+    stop("The fraction is not an integer")
+  }
+  c <- sample_n(df,n)
+return (c)
+}
+
+frac_rows(df, 1000)
+```
+
+```{r}
+#3.1 Solved by Ankita Dodihal Dhwani Trivedi Miraj Bhimani
+
+df<-read_csv("~/Downloads/COVID_19_Nursing_Home_Data_2021_09_12-2.csv")
+
+ans3.1<-df %>%
+  group_by(provider_state) %>%
+  summarise(count=(length(unique(federal_provider_number)))) %>% 
+  arrange(desc(count))
+ans3.1
+```
+
+
+```{r}
+#3.2 Solved by Ankita Dodihal Dhwani Trivedi Miraj Bhimani
+county_df<-df %>%
+  group_by(county) %>%
+  summarise(count=(length(unique(federal_provider_number)))) %>% 
+  
+  arrange(desc(count)) %>%
+  slice(1:5)
+county_df
+
+```
+
+
+```{r}
+#Question 3.3 Solved by Ankita Dodihal Dhwani Trivedi Miraj Bhimani
+
+df <- read.csv("~/Downloads/COVID_19_Nursing_Home_Data_2021_09_12-2.csv")
+df
+#The shortage of Nursing staff here corresponds to the no of hospitals having shortage by the week in a particular state however there might be some hospitals which did not have any shortage hence, the approach is to count the number of shortage of nursing staff in the state by federal provider number. For example x hospital in y state did not have shortage in nursing staff hence we will filter the shortage values accordingly. 
+
+total<- df%>% 
+  group_by(provider_state)%>%
+  summarise(count = (length(unique(federal_provider_number))))
+total
+
+
+```
+
+```{r}
+#Table 1
+table_1<- distinct(select(df,week_ending,provider_state,federal_provider_number,shortage_of_nursing_staff))%>%
+  filter(shortage_of_nursing_staff == "Y")%>%
+  arrange(week_ending, provider_state)%>%
+  group_by(provider_state, federal_provider_number)%>%
+  summarise(weeks=n())
+table_1
+
+temp_1<- table_1%>% 
+  group_by(provider_state)%>%
+  summarise(no_of_providers=n())
+temp_1
+
+temp_2 <- table_1%>%
+  filter(weeks>20)%>%
+  group_by(provider_state)%>%
+  summarise(providers_more_than_20=n())
+temp_2
+
+#Merge rows with different columns
+merge_table <- merge(total, temp_2, by = "provider_state", all = T)%>% drop_na()
+merge_table
+
+
+merge_table$percentage<- ((merge_table[,3]/merge_table[,2])*100)
+merge_table
+
+#To calculate the threshold value
+th_1 <- mean(merge_table$percentage)
+th_1
+
+th <- 10
+#Approach 1 To extract the state using mean value
+ans_1 <- merge_table%>%
+  filter(percentage>th)
+
+ans_1<- select(ans_1,provider_state)
+ans_1
+
+#Approach 2 to calculate the mean values by calling the threshold function
+threshold_1 <- function(th){
+  merge_table%>%
+  filter(percentage>th)
+  
+}
+th_10 <- threshold_1(10)
+th_20 <- threshold_1(20)
+th_30 <- threshold_1(30)
+
+
+```
+
+```{r}
+#Table 2
+table_2<- distinct(select(df,week_ending,provider_state,federal_provider_number,shortage_of_clinical_staff))%>%
+  filter(shortage_of_clinical_staff == "Y")%>%
+  arrange(week_ending, provider_state)%>%
+  group_by(provider_state, federal_provider_number)%>%
+  summarise(weeks=n())
+table_2
+
+#Calculating total no of providers who had shortage of clinical staff
+total_providers<- table_2%>% 
+  group_by(provider_state)%>%
+  summarise(no_of_providers=n())
+total_providers
+
+#Calculating total no of providers who had shortage of clinical staff of more than 20 weeks
+providers_more_than_20 <- table_2%>%
+  filter(weeks>20)%>%
+  group_by(provider_state)%>%
+  summarise(no_of_providers_more_than_20=n())
+providers_more_than_20
+
+#Merging two tables with different dimensions 
+merge_tables <- merge(total, providers_more_than_20, by = "provider_state", all = T)%>% drop_na()
+merge_tables
+
+merge_tables$percentage<- ((merge_tables[,3]/merge_tables[,2])*100)
+merge_tables
+
+th <- mean(merge_tables$percentage)
+th
+
+#Approach A
+ans2 <- merge_tables%>%
+  filter(percentage>th)
+ans2<- select(ans2, provider_state)
+ans2
+
+
+#Approach B
+threshold_1 <- function(th){
+  merge_tables%>%
+  filter(percentage>th)
+}
+th_10 <- threshold_1(10)
+th_20 <- threshold_1(20)
+th_30 <- threshold_1(30)
+th_40 <- threshold_1(40)
+```
+
+```{r}
+#Table 3 
+#shortage_of_aides
+table_3<- distinct(select(df,week_ending,provider_state,federal_provider_number,shortage_of_aides))%>%
+  filter(shortage_of_aides == "Y")%>%
+  arrange(week_ending, provider_state)%>%
+  group_by(provider_state, federal_provider_number)%>%
+  summarise(providers_with_shortage=n())
+table_3
+
+#Calculating total no of providers who had shortage of aides
+total_providers<- table_3%>% 
+  group_by(provider_state)%>%
+  summarise(no_of_providers=n())
+total_providers
+
+#Calculating total no of providers who had shortage of aides of more than 20 weeks
+providers_more_than_20 <- table_3%>%
+  filter(providers_with_shortage>20)%>%
+  group_by(provider_state)%>%
+  summarise(no_of_providers_more_than_20=n())
+providers_more_than_20
+
+#Merging two tables with different dimensions 
+merge_tables <- merge(total, providers_more_than_20, by = "provider_state", all = T)%>% drop_na()
+merge_tables
+
+merge_tables$percentage<- ((merge_tables[,3]/merge_tables[,2])*100)
+merge_tables
+
+th <- mean(merge_tables$percentage)
+th
+#Approach A
+ans3 <- merge_tables%>%
+  filter(percentage>th)
+ans3<- select(ans3, provider_state)
+ans3
+
+threshold_1 <- function(th){
+  merge_tables%>%
+  filter(percentage>th)
+}
+th_10 <- threshold_1(10)
+th_20 <- threshold_1(20)
+th_30 <- threshold_1(30)
+th_40 <- threshold_1(40)
+```
+
+```{r}
+#Table 4
+#shortage_of_other_staff
+library(tidyr)
+library(dplyr)
+table_4<- distinct(select(df,week_ending,provider_state,federal_provider_number,shortage_of_other_staff))%>%
+  filter(shortage_of_other_staff == "Y")%>%
+  arrange(week_ending, provider_state)%>%
+  group_by(provider_state, federal_provider_number)%>%
+  summarise(weeks=n())
+table_4
+#Calculating total no of providers who had shortage of clinical staff
+total_providers<- table_4%>% 
+  group_by(provider_state)%>%
+  summarise(no_of_providers=n())
+total_providers
+
+#Calculating total no of providers who had shortage of clinical staff of more than 20 weeks
+providers_more_than_20 <- table_4%>%
+  filter(weeks>20)%>%
+  group_by(provider_state)%>%
+  summarise(no_of_providers_more_than_20=n())
+providers_more_than_20
+
+#Merging two tables with different dimensions 
+merge_tables <- merge(total, providers_more_than_20, by = "provider_state", all = T)%>% drop_na()
+merge_tables
+
+#To calculate the percentage of providers who had shortage of aides more than 20 weeks
+merge_tables$percentage<- ((merge_tables[,3]/merge_tables[,2])*100)
+merge_tables
+
+#library(tidyverse)
+#in3ca<-cbind(temp_3c_a1,temp_3c_a2)
+#fin3ca<- fin3ca[,-3]
+#fin3ca$threshold<- (fin3ca[,3] / fin3ca[,2])*100
+#fin3ca
+
+# Approach A (Calculating the threshold value by calculating mean)
+th_mean <- mean(merge_tables$percentage)
+th_mean
+
+merge_tables%>%
+  filter(percentage>th_mean)
+merge_tables$provider_state
+
+#Approach B Set the threshold values by creating a function
+threshold_1 <- function(th){
+  merge_tables%>%
+  filter(percentage>th)
+}
+th_10 <- threshold_1(10)
+th_20 <- threshold_1(20)
+th_30 <- threshold_1(30)
+th_40 <- threshold_1(40)
+
+
+```
+
+```{r}
+#Question 3.4 Solved by Ankita Dodhihal Dhwani Trivedi Miraj Bhimani 
+
+#Table1
+
+library(dplyr)
+library(tidyr)
+#Creating a data frame with the county name, federal provider number and the weeks of shortage of N95 masks for that corresponding provider in the county.
+
+table_4_1<- distinct(select(df,week_ending,county,federal_provider_number,any_current_supply_of_n95_masks))%>%
+  filter(any_current_supply_of_n95_masks == "N")%>%
+  arrange(week_ending, county)%>%
+  group_by(county, federal_provider_number)%>%
+  summarise(weeks=n())
+table_4_1
+
+#Creating a data frame with the total number of unique providers in a county
+temp1_t1<- df%>% 
+  group_by(county)%>%
+  summarise(total_providers=(length(unique(federal_provider_number))))
+temp1_t1
+
+#Creating a data frame with the total number of providers in a county that experienced a shortage for more than 10 weeks
+temp2_t1 <- table_4_1%>%
+  filter(weeks>10)%>%
+  group_by(county)%>%
+  summarise(providers_more_than_10=n())
+temp2_t1
+
+#Merge rows with different columns - Merged the above data frames and dropped the counties that did not face a shortage of more than 10 weeks(i.e the NA values)
+merge_table41 <- merge(temp1_t1, temp2_t1, by = "county", all = T)%>% drop_na()
+merge_table41
+
+#Creating a calculated column to find the percentage of providers that faced over 10 weeks of shortage by the total providers that faced a shortage 
+merge_table41$percentage<- ((merge_table41[,3]/merge_table41[,2])*100)
+merge_table41
+
+#To calculate the threshold value
+th_4_t1 <- mean(merge_table41$percentage)
+th_4_t1
+
+#Counties that had shortage more than our threshold value
+ans3.4_1 <- merge_table41%>%
+  filter(percentage>th_4_t1)
+ans3.4_1<- select(ans3.4_1,county)
+ans3.4_1
+
+# Approach B to calculate the number of couties which have more than 10, 20, 30, 40
+threshold_1 <- function(th){
+  merge_table41%>%
+  filter(percentage>th)
+}
+th_1 <- threshold_1(10)
+th_1
+th_2 <- threshold_1(20)
+th_2
+th_3 <- threshold_1(30)
+th_3
+th_4 <- threshold_1(90)
+th_4
+```
+
+```{r}
+#3.4 
+#Table2
+
+#Creating a data frame with the county name, federal provider number and the weeks of shortage of surgical masks for that corresponding provider in the county.
+
+table_4_2<- distinct(select(df,week_ending,county,federal_provider_number,any_current_supply_of_surgical_masks))%>%
+  filter(any_current_supply_of_surgical_masks == "N")%>%
+  arrange(week_ending, county)%>%
+  group_by(county, federal_provider_number)%>%
+  summarise(weeks=n())
+table_4_2
+
+#Creating a data frame with the total number of unique providers in a county
+temp1_t1<- df%>% 
+  group_by(county)%>%
+  summarise(total_providers=(length(unique(federal_provider_number))))
+temp1_t1
+
+#Creating a data frame with the total number of providers in a county that experienced a shortage for more than 10 weeks
+temp2_t2 <- table_4_2%>%
+  filter(weeks>10)%>%
+  group_by(county)%>%
+  summarise(providers_more_than_10=n())
+temp2_t2
+
+#Merge rows with different columns - Merged the above data frames and dropped the counties that did not face a shortage of more than 10 weeks(i.e the NA values)
+merge_table42 <- merge(temp1_t1, temp2_t2, by = "county", all = T)%>% drop_na()
+merge_table42
+
+#Creating a calculated column to find the percentage of providers that faced over 10 weeks of shortage by the total providers in the county 
+merge_table42$percentage<- ((merge_table42[,3]/merge_table42[,2])*100)
+merge_table42
+
+#To calculate the threshold value
+th_4_t2 <- mean(merge_table42$percentage)
+th_4_t2
+
+#Counties that had shortage more than our threshold value
+ans3.4_2 <- merge_table42%>%
+  filter(percentage>th_4_t2)
+ans3.4_2
+
+ans3.4_2<- select(ans3.4_2,county)
+ans3.4_2
+
+# Approach B to calculate the number of couties which have more than 10, 20, 30, 40
+threshold_1 <- function(th){
+  merge_table42%>%
+  filter(percentage>th)
+}
+th_1 <- threshold_1(10)
+th_1
+th_2 <- threshold_1(20)
+th_2
+th_3 <- threshold_1(30)
+th_3
+th_4 <- threshold_1(40)
+th_4
+
+```
+
+```{r}
+#3.4 
+#Table3
+
+library(dplyr)
+library(tidyr)
+#Creating a data frame with the county name, federal provider number and the weeks of shortage of eye protection for that corresponding provider in the county.
+
+table_4_3<- distinct(select(df,week_ending,county,federal_provider_number,any_current_supply_of_eye_protection))%>%
+  filter(any_current_supply_of_eye_protection == "N")%>%
+  arrange(week_ending, county)%>%
+  group_by(county, federal_provider_number)%>%
+  summarise(weeks=n())
+table_4_3
+
+#Creating a data frame with the total number of unique providers in a county
+temp1_t1<- df%>% 
+  group_by(county)%>%
+  summarise(total_providers=(length(unique(federal_provider_number))))
+temp1_t1
+
+#Creating a data frame with the total number of providers in a county that experienced a shortage for more than 10 weeks
+temp2_t3 <- table_4_3%>%
+  filter(weeks>10)%>%
+  group_by(county)%>%
+  summarise(providers_more_than_10=n())
+temp2_t3
+
+#Merge rows with different columns - Merged the above data frames and dropped the counties that did not face a shortage of more than 10 weeks(i.e the NA values)
+merge_table43 <- merge(temp1_t1, temp2_t3, by = "county", all = T)%>% drop_na()
+merge_table43
+
+#Creating a calculated column to find the percentage of providers that faced over 10 weeks of shortage by the total providers in the county 
+merge_table43$percentage<- ((merge_table43[,3]/merge_table43[,2])*100)
+merge_table43
+
+#To calculate the threshold value
+th_4_t3 <- mean(merge_table43$percentage)
+th_4_t3
+
+#Counties that had shortage more than our threshold value
+ans3.4_3 <- merge_table43%>%
+  filter(percentage>th_4_t3)
+ans3.4_3
+
+ans3.4_3<- select(ans3.4_3,county)
+ans3.4_3
+
+# Approach B to calculate the number of couties which have more than 10, 20, 30, 40
+threshold_1 <- function(th){
+  merge_table43%>%
+  filter(percentage>th)
+}
+th_1 <- threshold_1(10)
+th_1
+th_2 <- threshold_1(20)
+th_2
+th_3 <- threshold_1(30)
+th_3
+th_4 <- threshold_1(9)
+th_4
+```
+
+```{r}
+#3.4
+#Table4
+
+library(dplyr)
+library(tidyr)
+#Creating a data frame with the county name, federal provider number and the weeks of shortage of gowns for that corresponding provider in the county.
+
+table_4_4<- distinct(select(df,week_ending,county,federal_provider_number,any_current_supply_of_gowns))%>%
+  filter(any_current_supply_of_gowns == "N")%>%
+  arrange(week_ending, county)%>%
+  group_by(county, federal_provider_number)%>%
+  summarise(weeks=n())
+table_4_4
+
+#Creating a data frame with the total number of unique providers in a county
+temp1_t1<- df%>% 
+  group_by(county)%>%
+  summarise(total_providers=(length(unique(federal_provider_number))))
+temp1_t1
+
+#Creating a data frame with the total number of providers in a county that experienced a shortage for more than 10 weeks
+temp2_t4 <- table_4_4%>%
+  filter(weeks>10)%>%
+  group_by(county)%>%
+  summarise(providers_more_than_10=n())
+temp2_t4
+
+#Merge rows with different columns - Merged the above data frames and dropped the counties that did not face a shortage of more than 10 weeks(i.e the NA values)
+merge_table44 <- merge(temp1_t1, temp2_t4, by = "county", all = T)%>% drop_na()
+merge_table44
+
+#Creating a calculated column to find the percentage of providers that faced over 10 weeks of shortage by the total providers in the county 
+merge_table44$percentage<- ((merge_table44[,3]/merge_table44[,2])*100)
+merge_table44
+
+#To calculate the threshold value
+th_4_t4 <- mean(merge_table44$percentage)
+th_4_t4
+
+#Counties that had shortage more than our threshold value
+ans3.4_4 <- merge_table44%>%
+  filter(percentage>th_4_t4)
+ans3.4_4
+
+ans3.4_4<- select(ans3.4_4,county)
+ans3.4_4
+
+# Approach B to calculate the number of couties which have more than 10, 20, 30, 40
+threshold_1 <- function(th){
+  merge_table44%>%
+  filter(percentage>th)
+}
+th_1 <- threshold_1(10)
+th_1
+th_2 <- threshold_1(20)
+th_2
+th_3 <- threshold_1(30)
+th_3
+th_4 <- threshold_1(90)
+th_4
+```
+
+
+```{r}
+library(dplyr)
+library(tidyr)
+#Creating a data frame with the county name, federal provider number and the weeks of shortage of gloves for that corresponding provider in the county.
+
+table_4_5<- distinct(select(df,week_ending,county,federal_provider_number,any_current_supply_of_gloves))%>%
+  filter(any_current_supply_of_gloves== "N")%>%
+  arrange(week_ending, county)%>%
+  group_by(county, federal_provider_number)%>%
+  summarise(weeks=n())
+table_4_5
+
+#Creating a data frame with the total number of unique providers in a county
+temp1_t1<- df%>% 
+  group_by(county)%>%
+  summarise(total_providers=(length(unique(federal_provider_number))))
+temp1_t1
+
+#Creating a data frame with the total number of providers in a county that experienced a shortage for more than 10 weeks
+temp2_t5 <- table_4_5%>%
+  filter(weeks>10)%>%
+  group_by(county)%>%
+  summarise(providers_more_than_10=n())
+temp2_t5
+
+#Merge rows with different columns - Merged the above data frames and dropped the counties that did not face a shortage of more than 10 weeks(i.e the NA values)
+merge_table45 <- merge(temp1_t1, temp2_t5, by = "county", all = T)%>% drop_na()
+merge_table45
+
+#Creating a calculated column to find the percentage of providers that faced over 10 weeks of shortage by the total providers in the county 
+merge_table45$percentage<- ((merge_table45[,3]/merge_table45[,2])*100)
+merge_table45
+
+#To calculate the threshold value
+th_4_t5 <- mean(merge_table45$percentage)
+th_4_t5
+
+#Counties that had shortage more than our threshold value
+ans3.4_5 <- merge_table45%>%
+  filter(percentage>th_4_t5)
+ans3.4_5
+
+ans3.4_5<- select(ans3.4_5,county)
+ans3.4_5
+
+# Approach B to calculate the number of couties which have more than 10, 20, 30, 40
+threshold_1 <- function(th){
+  merge_table45%>%
+  filter(percentage>th)
+}
+th_1 <- threshold_1(10)
+th_1
+th_2 <- threshold_1(20)
+th_2
+th_3 <- threshold_1(30)
+th_3
+th_4 <- threshold_1(90)
+th_4
+```
+
+```{r}
+#3.4
+#Table6
+
+library(dplyr)
+library(tidyr)
+#Creating a data frame with the county name, federal provider number and the weeks of shortage of sanitizer for that corresponding provider in the county.
+
+table_4_6<- distinct(select(df,week_ending,county,federal_provider_number,any_current_supply_of_hand_sanitizer))%>%
+  filter(any_current_supply_of_hand_sanitizer== "N")%>%
+  arrange(week_ending, county)%>%
+  group_by(county, federal_provider_number)%>%
+  summarise(weeks=n())
+table_4_6
+
+#Creating a data frame with the total number of unique providers in a county
+temp1_t1<- df%>% 
+  group_by(county)%>%
+  summarise(total_providers=(length(unique(federal_provider_number))))
+temp1_t1
+
+#Creating a data frame with the total number of providers in a county that experienced a shortage for more than 10 weeks
+temp2_t6 <- table_4_6%>%
+  filter(weeks>10)%>%
+  group_by(county)%>%
+  summarise(providers_more_than_10=n())
+temp2_t6
+
+#Merge rows with different columns - Merged the above data frames and dropped the counties that did not face a shortage of more than 10 weeks(i.e the NA values)
+merge_table46 <- merge(temp1_t1, temp2_t6, by = "county", all = T)%>% drop_na()
+merge_table46
+
+#Creating a calculated column to find the percentage of providers that faced over 10 weeks of shortage by the total providers in the county 
+merge_table46$percentage<- ((merge_table46[,3]/merge_table46[,2])*100)
+merge_table46
+
+#To calculate the threshold value
+th_4_t6 <- mean(merge_table46$percentage)
+th_4_t6
+
+#Counties that had shortage more than our threshold value
+ans3.4_6 <- merge_table46%>%
+  filter(percentage>th_4_t6)
+ans3.4_6
+ans3.4_6<- select(ans3.4_6,county)
+ans3.4_6
+
+# Approach B to calculate the number of couties which have more than 10, 20, 30, 40
+threshold_1 <- function(th){
+  merge_table46%>%
+  filter(percentage>th)
+}
+th_1 <- threshold_1(10)
+th_1
+th_2 <- threshold_1(20)
+th_2
+th_3 <- threshold_1(30)
+th_3
+th_4 <- threshold_1(90)
+th_4
+```
+
+```{r}
+#3.5
+#Creating a data frame with the federal provider name and the weeks of shortage of ventilators for that corresponding provider.
+table_5_1<- distinct(select(df,week_ending,county,federal_provider_number,provider_name ,any_current_supply_of_ventilator_supplies))%>%
+  filter(any_current_supply_of_ventilator_supplies== "N")%>%
+  group_by(provider_name)%>%
+  summarise(weeks=n())%>%
+  filter(weeks>10) #filtering out provider that faced less than or equal to 10 weeks of shortage
+table_5_1
+
+```
+
+---
+Contribution: Everyone had equal contribution to the assignment. 
+---
